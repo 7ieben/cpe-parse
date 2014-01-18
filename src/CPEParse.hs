@@ -2,9 +2,11 @@ module CPEParse where
 
 -- cpe:/{part}:{vendor}:{product}:{version}:{update}:{edition}:{language}
 
+-- Datatypes for representing a CPE Record
 data CPEPart = H  --Hardware
              | A  --Application
              | O  --Operatingsystem
+               deriving (Show)
 
 data CPERecord = CPERecord
     { part :: CPEPart
@@ -14,20 +16,26 @@ data CPERecord = CPERecord
     , update :: Int
     , edition :: String
     , language :: String
-    }
-
-data CPEParseState = CPEParseState {
-      restString :: String
     } deriving (Show)
 
-initState :: String -> CPEParseState
-initState s = CPEParseState s
+-- Just a simple State Monad
+newtype ParseState s a = ParseState { runState :: s -> (a,s) }
 
-parsePart :: CPEParseState -> (String, CPEParseState)
-parsePart ps = (val, newState)
-    where
-      (val, rest) = span (\x -> x /= ':') $ restString ps
-      newState = CPEParseState {restString = drop 1 rest}
+instance Monad (ParseState s) where
+    return a = ParseState $ \s -> (a, s)
+    m >>= k = ParseState $ \s -> let (a, s') = runState m s
+                                 in runState (k a) s'
 
-isEOS :: String -> Bool
-isEOS = (==) ""            
+-- Takes a String (representing the still to pasre CPE String)
+-- returns a pair of 1: the Value of the next Section as a String
+--                   2: the rest of the CPE String as the new State
+parseSection :: ParseState String String
+parseSection = ParseState (\s -> (takeWhile (/= ':') s, 
+                                  drop 1 $ dropWhile (/= ':') s)) 
+
+-- cpe = "a:oracle:db:12c:1:enterprice:de"
+stringToCPEPart :: String -> CPEPart
+stringToCPEPart s = case s of
+                      "h" -> H
+                      "a" -> A
+                      "o" -> O

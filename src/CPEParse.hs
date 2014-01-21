@@ -1,7 +1,8 @@
-module CPEParse where
-
--- cpe:/{part}:{vendor}:{product}:{version}:{update}:{edition}:{language}
--- cpe = "cpe:/a:oracle:db:12c:1:enterprice:de"
+module CPEParse 
+    ( CPEPart
+    , CPERecord
+    , parseCPE
+    ) where
 
 -- Datatypes for representing a CPE Record
 data CPEPart = H  --Hardware

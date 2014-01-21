@@ -1,0 +1,15 @@
+name:                cpe-parse
+version:             0.1.0.0
+synopsis:            A simple CPE Parser         
+license:             PublicDomain
+license-file:        LICENSE
+author:              Steven Kutsch
+maintainer:          kutsch.steven@gmail.com
+build-type:          Simple
+cabal-version:       >=1.8
+
+library
+  exposed-modules:     CPEParse
+  -- other-modules:       
+  build-depends:       base ==4.6.*
+  hs-source-dirs:      src

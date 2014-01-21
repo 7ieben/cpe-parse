@@ -1,6 +1,7 @@
 module CPEParse where
 
 -- cpe:/{part}:{vendor}:{product}:{version}:{update}:{edition}:{language}
+-- cpe = "cpe:/a:oracle:db:12c:1:enterprice:de"
 
 -- Datatypes for representing a CPE Record
 data CPEPart = H  --Hardware
@@ -18,24 +19,27 @@ data CPERecord = CPERecord
     , language :: String
     } deriving (Show)
 
--- Just a simple State Monad
-newtype ParseState s a = ParseState { runState :: s -> (a,s) }
-
-instance Monad (ParseState s) where
-    return a = ParseState $ \s -> (a, s)
-    m >>= k = ParseState $ \s -> let (a, s') = runState m s
-                                 in runState (k a) s'
-
--- Takes a String (representing the still to pasre CPE String)
--- returns a pair of 1: the Value of the next Section as a String
---                   2: the rest of the CPE String as the new State
-parseSection :: ParseState String String
-parseSection = ParseState (\s -> (takeWhile (/= ':') s, 
-                                  drop 1 $ dropWhile (/= ':') s)) 
-
--- cpe = "a:oracle:db:12c:1:enterprice:de"
 stringToCPEPart :: String -> CPEPart
 stringToCPEPart s = case s of
                       "h" -> H
                       "a" -> A
                       "o" -> O
+
+-- from Data.List.Split
+splitOn :: (a -> Bool) -> [a] -> [[a]]
+splitOn _ [] = []
+splitOn f l@(x:xs)
+  | f x = splitOn f xs
+  | otherwise = let (h,t) = break f l in h:(splitOn f t)
+
+parseCPE :: String -> CPERecord
+parseCPE s = CPERecord part vendor product version update edition language
+    where
+      cpeList = splitOn (== ':') $ drop 5 s
+      part = stringToCPEPart $ cpeList !! 0
+      vendor = cpeList !! 1
+      product = cpeList !! 2
+      version = cpeList !! 3
+      update = read $ cpeList !! 4
+      edition = cpeList !! 5
+      language = cpeList !! 6

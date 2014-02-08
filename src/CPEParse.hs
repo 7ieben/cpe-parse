@@ -26,17 +26,17 @@ stringToCPEPart s = case s of
                       "a" -> A
                       "o" -> O
 
--- from Data.List.Split
-splitOn :: (a -> Bool) -> [a] -> [[a]]
-splitOn _ [] = []
-splitOn f l@(x:xs)
-  | f x = splitOn f xs
-  | otherwise = let (h,t) = break f l in h:(splitOn f t)
+split :: Eq a => a -> [a] -> [[a]]
+split _ [] = []
+split delim l = let (init,remainder) = span (/= delim) l
+                in init : case remainder of
+                            [] -> []
+                            x -> split delim (tail remainder)
 
 parseCPE :: String -> CPERecord
 parseCPE s = CPERecord part vendor product version update edition language
     where
-      cpeList = splitOn (== ':') $ drop 5 s
+      cpeList = split ':' $ drop 5 s
       part = stringToCPEPart $ cpeList !! 0
       vendor = cpeList !! 1
       product = cpeList !! 2

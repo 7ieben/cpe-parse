@@ -1,30 +1,24 @@
 module CPEParse 
-    ( CPEPart
-    , CPERecord
+    ( CPERecord
     , parseCPE
     ) where
 
--- Datatypes for representing a CPE Record
-data CPEPart = H  --Hardware
-             | A  --Application
-             | O  --Operatingsystem
-               deriving (Show)
+import Text.Printf (printf)
 
 data CPERecord = CPERecord
-    { part :: CPEPart
+    { part :: String
     , vendor :: String
     , product :: String
     , version :: String
     , update :: Int
     , edition :: String
     , language :: String
-    } deriving (Show)
+    } deriving (Eq, Ord)
 
-stringToCPEPart :: String -> CPEPart
-stringToCPEPart s = case s of
-                      "h" -> H
-                      "a" -> A
-                      "o" -> O
+instance Show CPERecord where
+    show cpe = printf "cpe:/%s:%s:%s:%s:%d:%s:%s"
+                 (part cpe) (vendor cpe) (CPEParse.product cpe) (version cpe)
+                 (update cpe) (edition cpe) (language cpe)
 
 split :: Eq a => a -> [a] -> [[a]]
 split _ [] = []
@@ -37,7 +31,7 @@ parseCPE :: String -> CPERecord
 parseCPE s = CPERecord part vendor product version update edition language
     where
       cpeList = split ':' $ drop 5 s
-      part = stringToCPEPart $ cpeList !! 0
+      part = cpeList !! 0
       vendor = cpeList !! 1
       product = cpeList !! 2
       version = cpeList !! 3

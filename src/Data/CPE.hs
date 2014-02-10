@@ -1,5 +1,6 @@
 module Data.CPE (CPERecord) where
 
+import Prelude hiding (product)
 import Text.Printf (printf)
 
 data CPERecord = CPERecord
@@ -14,7 +15,7 @@ data CPERecord = CPERecord
 
 instance Show CPERecord where
     show cpe = printf "cpe:/%s:%s:%s:%s:%d:%s:%s"
-                 (part cpe) (vendor cpe) (Data.CPE.product cpe) (version cpe)
+                 (part cpe) (vendor cpe) (product cpe) (version cpe)
                  (update cpe) (edition cpe) (language cpe)
 
 instance Read CPERecord where

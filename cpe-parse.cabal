@@ -1,5 +1,5 @@
 name:                cpe-parse
-version:             0.2.0.0
+version:             0.2.0.1
 synopsis:            A simple CPE Parser         
 license:             PublicDomain
 license-file:        LICENSE

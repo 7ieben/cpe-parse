@@ -1,4 +1,4 @@
-module Data.CPE (CPERecord) where
+module Data.CPE (CPERecord(..)) where
 
 import Prelude hiding (product)
 import Text.Printf (printf)
